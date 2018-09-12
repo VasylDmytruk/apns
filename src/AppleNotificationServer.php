@@ -16,6 +16,7 @@ class AppleNotificationServer
     const RESPONSE_PARAM_STATUS = 'status';
     const RESPONSE_PARAM_MESSAGE = 'message';
     const RESPONSE_PARAM_STATUS_SUCCESS = 200;
+    const RESPONSE_PARAM_MESSAGE_SUCCESS = 'OK';
     const CURL_HTTP_VERSION_2_0_KEY = 'CURL_HTTP_VERSION_2_0';
     const CURL_HTTP_VERSION_2_0_VALUE = 3;
 
@@ -135,7 +136,7 @@ class AppleNotificationServer
         ]);
 
         $result = curl_exec($http2ch);
-        if ($result === false) {
+        if (!$result) {
             $errorMessage = 'Curl failed with error: ' . curl_error($http2ch);
             throw new \RuntimeException($errorMessage);
         }
@@ -144,7 +145,7 @@ class AppleNotificationServer
 
         $responseMessage = '';
         if (\is_string($result)) {
-            $responseMessage = empty($result) ? 'OK' : $result;
+            $responseMessage = empty($result) ? self::RESPONSE_PARAM_MESSAGE_SUCCESS : $result;
         }
 
         return [
