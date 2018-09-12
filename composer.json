@@ -1,6 +1,6 @@
 {
     "name": "autoxloo/apns",
-    "description": "Apple Notification Sender",
+    "description": "Apple Notification Server",
     "type": "library",
     "license": "BSD-3-Clause",
     "authors": [
