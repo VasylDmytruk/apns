@@ -136,7 +136,7 @@ class AppleNotificationServer
         ]);
 
         $result = curl_exec($http2ch);
-        if (!$result) {
+        if ($result === false) {
             $errorMessage = 'Curl failed with error: ' . curl_error($http2ch);
             throw new \RuntimeException($errorMessage);
         }
