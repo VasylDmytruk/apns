@@ -1,0 +1,24 @@
+{
+    "name": "autoxloo/apns",
+    "description": "Apple Notification Sender",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Vasyl Dmytruk",
+            "email": "vasyl.dmytruk@xloo.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "autoxloo\\apns\\": "src"
+        }
+    }
+}
