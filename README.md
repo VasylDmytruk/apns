@@ -71,6 +71,15 @@ $apns = new AppleNotificationServer($appleCertPath);
 $response = $apns->send($token, $payload);
 ```
 
+`AppleNotificationServer` sends push notification first on `$apiUrl` (https://api.push.apple.com/3/device)
+if not success (not status code `200`), then sends on `$apiUrlDev` (https://api.development.push.apple.com/3/device).
+If you don't want to send push notification on $apiUrlDev` set it value to `false`.
+Also if you want to send push notification only on dev url, you can do so like this:
+
+```php
+$apns = new AppleNotificationServer($appleCertPath, 'https://api.development.push.apple.com/3/device', false);
+```
+
 See [Generating a Remote Notification](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)
 and [Sending Notification Requests to APNs](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns)
 for more details.
