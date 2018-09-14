@@ -97,8 +97,7 @@ class AppleNotificationServer
         $message = json_encode($payload);
         $result = $this->sendHTTP2Push($http2ch, $message, $token);
 
-        // TODO remove this after testing
-        if (self::RESPONSE_PARAM_STATUS_SUCCESS != $result[self::RESPONSE_PARAM_STATUS]) {
+        if ($this->apiUrlDev && self::RESPONSE_PARAM_STATUS_SUCCESS != $result[self::RESPONSE_PARAM_STATUS]) {
             $result = $this->sendHTTP2Push($http2ch, $message, $token, true);
         }
 
