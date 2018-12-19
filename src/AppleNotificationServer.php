@@ -75,6 +75,38 @@ class AppleNotificationServer
     }
 
     /**
+     * Sends notification to many recipients (`$tokens`).
+     *
+     * @param array $tokens List of tokens of devices to send push notification on.
+     * @param array $payload APNS payload data (will be json encoded).
+     *
+     * @return array List of status codes with response messages.
+     */
+    public function sendToMany(array $tokens, array $payload)
+    {
+        $sendResult = [];
+
+        $http2ch = curl_init();
+        curl_setopt($http2ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+
+        $message = json_encode($payload);
+
+        foreach ($tokens as $token) {
+            $result = $this->sendHTTP2Push($http2ch, $message, $token);
+
+            if ($this->apiUrlDev && self::RESPONSE_PARAM_STATUS_SUCCESS != $result[self::RESPONSE_PARAM_STATUS]) {
+                $result = $this->sendHTTP2Push($http2ch, $message, $token, true);
+            }
+
+            $sendResult[] = $result;
+        }
+
+        curl_close($http2ch);
+
+        return $sendResult;
+    }
+
+    /**
      * Sends notification to recipient (`$token`).
      *
      * @param string $token Token of device to send push notification on.
