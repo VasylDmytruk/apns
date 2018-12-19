@@ -98,7 +98,7 @@ class AppleNotificationServer
                 $result = $this->sendHTTP2Push($http2ch, $message, $token, true);
             }
 
-            $sendResult[] = $result;
+            $sendResult[$token] = $result;
         }
 
         curl_close($http2ch);
