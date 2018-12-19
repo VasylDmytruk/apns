@@ -71,6 +71,23 @@ $apns = new AppleNotificationServer($appleCertPath);
 $response = $apns->send($token, $payload);
 ```
 
+or if you want to send to many tokens:
+
+```php
+$appleCertPath = __DIR__ . '/wxv_cert.pem';
+$tokens = [
+    'some device token',
+    'some other device token',
+];
+$payload = [
+    'some key1' => 'some value1',
+    'some key2' => 'some value2',
+];
+
+$apns = new AppleNotificationServer($appleCertPath);
+$response = $apns->sendToMany($tokens, $payload);
+```
+
 `AppleNotificationServer` sends push notification first on `$apiUrl` (https://api.push.apple.com/3/device)
 if not success (not status code `200`), then sends on `$apiUrlDev` (https://api.development.push.apple.com/3/device).
 If you don't want to send push notification on $apiUrlDev` set it value to `false`.
