@@ -19,6 +19,7 @@ class AppleNotificationServer
     const RESPONSE_PARAM_MESSAGE_SUCCESS = 'OK';
     const CURL_HTTP_VERSION_2_0_KEY = 'CURL_HTTP_VERSION_2_0';
     const CURL_HTTP_VERSION_2_0_VALUE = 3;
+    const APN_TOPIC_HEADER = 'apns-topic';
 
     /**
      * @var string Path to apple .pem certificate.
@@ -40,6 +41,11 @@ class AppleNotificationServer
      * @var int Push timeout.
      */
     protected $pushTimeOut;
+    /**
+     * @var string 'apns-topic' header
+     * @see https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html
+     */
+    protected $topic = null;
 
 
     /**
@@ -50,15 +56,16 @@ class AppleNotificationServer
      * @param string $apiUrlDev Apple API notification development url.
      * @param int $apnsPort APNS posrt.
      * @param int $pushTimeOut Push timeout.
+     * @param string|null $topic
      */
     public function __construct(
         $appleCertPath,
         $apiUrl = 'https://api.push.apple.com/3/device',
         $apiUrlDev = 'https://api.development.push.apple.com/3/device',
         $apnsPort = 443,
-        $pushTimeOut = 10
-    )
-    {
+        $pushTimeOut = 10,
+        $topic = null
+    ) {
         if (!is_string($appleCertPath) || !file_exists($appleCertPath)) {
             throw new \InvalidArgumentException('Argument "$appleCertPath" must be a valid string path to file');
         }
@@ -68,6 +75,7 @@ class AppleNotificationServer
         $this->apiUrlDev = $apiUrlDev;
         $this->apnsPort = $apnsPort;
         $this->pushTimeOut = $pushTimeOut;
+        $this->topic = $topic;
 
         if (!\defined(self::CURL_HTTP_VERSION_2_0_KEY)) {
             \define(self::CURL_HTTP_VERSION_2_0_KEY, self::CURL_HTTP_VERSION_2_0_VALUE);
@@ -155,7 +163,7 @@ class AppleNotificationServer
         $apiUrl = $devApiUrl ? $this->apiUrlDev : $this->apiUrl;
         $url = "$apiUrl/{$token}";
 
-        curl_setopt_array($http2ch, [
+        $curlOptions = [
             CURLOPT_URL => $url,
             CURLOPT_PORT => $this->apnsPort,
             CURLOPT_POST => true,
@@ -164,7 +172,13 @@ class AppleNotificationServer
             CURLOPT_TIMEOUT => $this->pushTimeOut,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSLCERT => $this->appleCertPath,
-        ]);
+        ];
+
+        if (!empty($this->topic)) {
+            $curlOptions[CURLOPT_HTTPHEADER][] = self::APN_TOPIC_HEADER . ': ' . $this->topic;
+        }
+
+        curl_setopt_array($http2ch, $curlOptions);
 
         $result = curl_exec($http2ch);
         if ($result === false) {
