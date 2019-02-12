@@ -126,7 +126,7 @@ class AppleNotificationServer
         $http2ch = curl_init();
         curl_setopt($http2ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
 
-        $message = json_encode($payload);
+        $message = json_encode($payload, JSON_UNESCAPED_UNICODE);
         $result = $this->sendHTTP2Push($http2ch, $message, $token);
 
         if ($this->apiUrlDev && self::RESPONSE_PARAM_STATUS_SUCCESS != $result[self::RESPONSE_PARAM_STATUS]) {
