@@ -75,7 +75,7 @@ class AppleNotificationServer
         $this->apiUrlDev = $apiUrlDev;
         $this->apnsPort = $apnsPort;
         $this->pushTimeOut = $pushTimeOut;
-        $this->topic = $topic;
+        $this->setTopic($topic);
 
         if (!\defined(self::CURL_HTTP_VERSION_2_0_KEY)) {
             \define(self::CURL_HTTP_VERSION_2_0_KEY, self::CURL_HTTP_VERSION_2_0_VALUE);
@@ -197,5 +197,15 @@ class AppleNotificationServer
             self::RESPONSE_PARAM_STATUS => $status,
             self::RESPONSE_PARAM_MESSAGE => $responseMessage,
         ];
+    }
+
+    /**
+     * @param string $topic
+     */
+    public function setTopic($topic)
+    {
+        if (is_string($topic)) {
+            $this->topic = $topic;
+        }
     }
 }
