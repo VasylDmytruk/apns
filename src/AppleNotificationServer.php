@@ -208,4 +208,14 @@ class AppleNotificationServer
             $this->topic = $topic;
         }
     }
+
+    /**
+     * @param string $appleCertPath
+     */
+    public function setAppleCertPath($appleCertPath)
+    {
+        if (is_string($appleCertPath) && file_exists($appleCertPath)) {
+            $this->appleCertPath = $appleCertPath;
+        }
+    }
 }
