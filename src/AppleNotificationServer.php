@@ -210,6 +210,8 @@ class AppleNotificationServer
     }
 
     /**
+     * Sets Apple cert path.
+     *
      * @param string $appleCertPath
      */
     public function setAppleCertPath($appleCertPath)
