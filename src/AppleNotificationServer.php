@@ -2,6 +2,8 @@
 
 namespace autoxloo\apns;
 
+use autoxloo\apns\helpers\CurlHeaderHelper;
+
 /**
  * Class AppleNotificationServer Sends push notification via Apple Notification Server.
  * >Note: For now it sends via production url if not success, tries via development url.
@@ -14,9 +16,11 @@ class AppleNotificationServer
     const PARAM_TOKEN = 'token';
     const PARAM_DATA = 'data';
     const RESPONSE_PARAM_STATUS = 'status';
+    const RESPONSE_PARAM_APNS_ID = 'apnsId';
     const RESPONSE_PARAM_MESSAGE = 'message';
     const RESPONSE_PARAM_STATUS_SUCCESS = 200;
     const RESPONSE_PARAM_MESSAGE_SUCCESS = 'OK';
+    const RESPONSE_HEADER_APNS_ID = 'apns-id';
     const CURL_HTTP_VERSION_2_0_KEY = 'CURL_HTTP_VERSION_2_0';
     const CURL_HTTP_VERSION_2_0_VALUE = 3;
     const APN_TOPIC_HEADER = 'apns-topic';
@@ -182,6 +186,7 @@ class AppleNotificationServer
             CURLOPT_TIMEOUT => $this->pushTimeOut,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSLCERT => $this->appleCertPath,
+            CURLOPT_HEADER => true,
         ];
 
         if (!empty($this->topic)) {
@@ -202,6 +207,9 @@ class AppleNotificationServer
 
         $status = curl_getinfo($http2ch, CURLINFO_HTTP_CODE);
 
+        list($headers, $result) = CurlHeaderHelper::getHeadersAndBody($http2ch, $result);
+        $apnsId = isset($headers[self::RESPONSE_HEADER_APNS_ID]) ? $headers[self::RESPONSE_HEADER_APNS_ID] : null;
+
         $responseMessage = '';
         if (\is_string($result)) {
             $responseMessage = empty($result) ? self::RESPONSE_PARAM_MESSAGE_SUCCESS : $result;
@@ -210,6 +218,7 @@ class AppleNotificationServer
         return [
             self::RESPONSE_PARAM_STATUS => $status,
             self::RESPONSE_PARAM_MESSAGE => $responseMessage,
+            self::RESPONSE_PARAM_APNS_ID => $apnsId,
         ];
     }
 
