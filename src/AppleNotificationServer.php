@@ -48,7 +48,7 @@ class AppleNotificationServer
      */
     protected $topic = null;
     /**
-     * @var null|int 'apns-expiration' header
+     * @var null|int 'apns-expiration' header value.
      * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
     protected $expiration = null;
@@ -220,6 +220,16 @@ class AppleNotificationServer
     {
         if (is_string($topic)) {
             $this->topic = $topic;
+        }
+    }
+
+    /**
+     * @param int $expiration 'apns-expiration' header value
+     */
+    public function setExpiration($expiration)
+    {
+        if ($expiration !== null && is_int($expiration)) {
+            $this->expiration = $expiration;
         }
     }
 
