@@ -20,6 +20,7 @@ class AppleNotificationServer
     const CURL_HTTP_VERSION_2_0_KEY = 'CURL_HTTP_VERSION_2_0';
     const CURL_HTTP_VERSION_2_0_VALUE = 3;
     const APN_TOPIC_HEADER = 'apns-topic';
+    const APN_EXPIRATION_HEADER = 'apns-expiration';
 
     /**
      * @var string Path to apple .pem certificate.
@@ -43,9 +44,14 @@ class AppleNotificationServer
     protected $pushTimeOut;
     /**
      * @var string 'apns-topic' header
-     * @see https://developer.apple.com/library/archive/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html
+     * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
     protected $topic = null;
+    /**
+     * @var null|int 'apns-expiration' header
+     * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
+     */
+    protected $expiration = null;
 
 
     /**
@@ -57,6 +63,8 @@ class AppleNotificationServer
      * @param int $apnsPort APNS posrt.
      * @param int $pushTimeOut Push timeout.
      * @param string|null $topic
+     * @param null|int $expiration The date at which the notification is no longer valid.
+     * This value is a Unix epoch expressed in seconds (UTC).
      */
     public function __construct(
         $appleCertPath,
@@ -64,7 +72,8 @@ class AppleNotificationServer
         $apiUrlDev = 'https://api.development.push.apple.com/3/device',
         $apnsPort = 443,
         $pushTimeOut = 10,
-        $topic = null
+        $topic = null,
+        $expiration = null
     ) {
         if (!is_string($appleCertPath) || !file_exists($appleCertPath)) {
             throw new \InvalidArgumentException('Argument "$appleCertPath" must be a valid string path to file');
@@ -76,6 +85,7 @@ class AppleNotificationServer
         $this->apnsPort = $apnsPort;
         $this->pushTimeOut = $pushTimeOut;
         $this->setTopic($topic);
+        $this->expiration = $expiration;
 
         if (!\defined(self::CURL_HTTP_VERSION_2_0_KEY)) {
             \define(self::CURL_HTTP_VERSION_2_0_KEY, self::CURL_HTTP_VERSION_2_0_VALUE);
@@ -176,6 +186,10 @@ class AppleNotificationServer
 
         if (!empty($this->topic)) {
             $curlOptions[CURLOPT_HTTPHEADER][] = self::APN_TOPIC_HEADER . ': ' . $this->topic;
+        }
+
+        if ($this->expiration !== null) {
+            $curlOptions[CURLOPT_HTTPHEADER][] = self::APN_EXPIRATION_HEADER . ': ' . $this->expiration;
         }
 
         curl_setopt_array($http2ch, $curlOptions);
