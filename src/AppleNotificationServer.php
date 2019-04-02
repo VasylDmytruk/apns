@@ -85,7 +85,7 @@ class AppleNotificationServer
         $this->apnsPort = $apnsPort;
         $this->pushTimeOut = $pushTimeOut;
         $this->setTopic($topic);
-        $this->expiration = $expiration;
+        $this->setExpiration($expiration);
 
         if (!\defined(self::CURL_HTTP_VERSION_2_0_KEY)) {
             \define(self::CURL_HTTP_VERSION_2_0_KEY, self::CURL_HTTP_VERSION_2_0_VALUE);
