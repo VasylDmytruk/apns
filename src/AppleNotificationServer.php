@@ -201,7 +201,9 @@ class AppleNotificationServer
 
         $result = curl_exec($http2ch);
         if ($result === false) {
-            $errorMessage = 'Curl failed with error: ' . curl_error($http2ch);
+            $lastIp = curl_getinfo($http2ch, CURLINFO_PRIMARY_IP);
+            $lastIp = is_string($lastIp) ? $lastIp : '';
+            $errorMessage = 'Curl failed with error: ' . curl_error($http2ch) . ', ip: ' . $lastIp;
             throw new \RuntimeException($errorMessage);
         }
 
