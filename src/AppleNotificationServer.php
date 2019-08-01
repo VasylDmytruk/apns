@@ -187,6 +187,7 @@ class AppleNotificationServer
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSLCERT => $this->appleCertPath,
             CURLOPT_HEADER => true,
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
         ];
 
         if (!empty($this->topic)) {
