@@ -25,6 +25,7 @@ class AppleNotificationServer
     const CURL_HTTP_VERSION_2_0_VALUE = 3;
     const APN_TOPIC_HEADER = 'apns-topic';
     const APN_EXPIRATION_HEADER = 'apns-expiration';
+    const APN_PUSH_TYPE_HEADER = 'apns-push-type';
 
     /**
      * @var string Path to apple .pem certificate.
@@ -50,12 +51,17 @@ class AppleNotificationServer
      * @var string 'apns-topic' header
      * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
-    protected $topic = null;
+    protected $topic;
     /**
      * @var null|int 'apns-expiration' header value.
      * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
-    protected $expiration = null;
+    protected $expiration;
+    /**
+     * @var string|null 'apns-push-type' header value.
+     * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
+     */
+    protected $pushType;
 
 
     /**
@@ -77,7 +83,8 @@ class AppleNotificationServer
         $apnsPort = 443,
         $pushTimeOut = 10,
         $topic = null,
-        $expiration = null
+        $expiration = null,
+        $pushType = null
     ) {
         if (!is_string($appleCertPath) || !file_exists($appleCertPath)) {
             throw new \InvalidArgumentException('Argument "$appleCertPath" must be a valid string path to file');
@@ -90,6 +97,7 @@ class AppleNotificationServer
         $this->pushTimeOut = $pushTimeOut;
         $this->setTopic($topic);
         $this->setExpiration($expiration);
+        $this->setPushType($pushType);
 
         if (!\defined(self::CURL_HTTP_VERSION_2_0_KEY)) {
             \define(self::CURL_HTTP_VERSION_2_0_KEY, self::CURL_HTTP_VERSION_2_0_VALUE);
@@ -190,13 +198,7 @@ class AppleNotificationServer
             CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
         ];
 
-        if (!empty($this->topic)) {
-            $curlOptions[CURLOPT_HTTPHEADER][] = self::APN_TOPIC_HEADER . ': ' . $this->topic;
-        }
-
-        if ($this->expiration !== null) {
-            $curlOptions[CURLOPT_HTTPHEADER][] = self::APN_EXPIRATION_HEADER . ': ' . $this->expiration;
-        }
+        $this->setHeaders($curlOptions);
 
         curl_setopt_array($http2ch, $curlOptions);
 
@@ -223,6 +225,31 @@ class AppleNotificationServer
             self::RESPONSE_PARAM_MESSAGE => $responseMessage,
             self::RESPONSE_PARAM_APNS_ID => $apnsId,
         ];
+    }
+
+    /**
+     * Sets curl headers.
+     *
+     * @param array $curlOptions
+     */
+    protected function setHeaders(array &$curlOptions)
+    {
+        $this->setHeader($curlOptions, self::APN_TOPIC_HEADER, $this->topic);
+        $this->setHeader($curlOptions, self::APN_EXPIRATION_HEADER, $this->expiration);
+        $this->setHeader($curlOptions, self::APN_PUSH_TYPE_HEADER, $this->pushType);
+    }
+
+    /**
+     * Sets curl header.
+     *
+     * @param string $headerKey
+     * @param string $headerValue
+     */
+    protected function setHeader(array &$curlOptions, $headerKey, $headerValue)
+    {
+        if (!empty($headerValue)) {
+            $curlOptions[CURLOPT_HTTPHEADER][] = $headerKey . ': ' . $headerValue;
+        }
     }
 
     /**
@@ -254,6 +281,16 @@ class AppleNotificationServer
     {
         if (is_string($appleCertPath) && file_exists($appleCertPath)) {
             $this->appleCertPath = $appleCertPath;
+        }
+    }
+
+    /**
+     * @param string $pushType
+     */
+    public function setPushType($pushType)
+    {
+        if (is_string($pushType)) {
+            $this->pushType = $pushType;
         }
     }
 }
