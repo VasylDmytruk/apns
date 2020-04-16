@@ -27,6 +27,13 @@ class AppleNotificationServer
     const APN_EXPIRATION_HEADER = 'apns-expiration';
     const APN_PUSH_TYPE_HEADER = 'apns-push-type';
 
+    const PUSH_TYPE_ALERT = 'alert';
+    const PUSH_TYPE_BACKGROUND = 'background';
+    const PUSH_TYPE_VOIP = 'voip';
+    const PUSH_TYPE_COMPLICATION = 'complication';
+    const PUSH_TYPE_FILEPROVIDER = 'fileprovider';
+    const PUSH_TYPE_MDM = 'mdm';
+
     /**
      * @var string Path to apple .pem certificate.
      */
@@ -75,11 +82,12 @@ class AppleNotificationServer
      * @param string|null $topic
      * @param null|int $expiration The date at which the notification is no longer valid.
      * This value is a Unix epoch expressed in seconds (UTC).
+     * @param null|string $pushType Apns push type ('apns-push-type' header value).
      */
     public function __construct(
         $appleCertPath,
         $apiUrl = 'https://api.push.apple.com/3/device',
-        $apiUrlDev = 'https://api.development.push.apple.com/3/device',
+        $apiUrlDev = 'https://api.sandbox.push.apple.com/3/device',
         $apnsPort = 443,
         $pushTimeOut = 10,
         $topic = null,
@@ -247,7 +255,7 @@ class AppleNotificationServer
      */
     protected function setHeader(array &$curlOptions, $headerKey, $headerValue)
     {
-        if (!empty($headerValue)) {
+        if ($headerValue !== null) {
             $curlOptions[CURLOPT_HTTPHEADER][] = $headerKey . ': ' . $headerValue;
         }
     }
