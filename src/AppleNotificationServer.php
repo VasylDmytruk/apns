@@ -87,7 +87,7 @@ class AppleNotificationServer
     public function __construct(
         $appleCertPath,
         $apiUrl = 'https://api.push.apple.com/3/device',
-        $apiUrlDev = 'https://api.development.push.apple.com/3/device',
+        $apiUrlDev = 'https://api.sandbox.push.apple.com/3/device',
         $apnsPort = 443,
         $pushTimeOut = 10,
         $topic = null,
