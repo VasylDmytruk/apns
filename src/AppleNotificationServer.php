@@ -255,7 +255,7 @@ class AppleNotificationServer
      */
     protected function setHeader(array &$curlOptions, $headerKey, $headerValue)
     {
-        if (!empty($headerValue)) {
+        if ($headerValue !== null) {
             $curlOptions[CURLOPT_HTTPHEADER][] = $headerKey . ': ' . $headerValue;
         }
     }
