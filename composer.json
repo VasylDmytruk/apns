@@ -11,7 +11,9 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.5.0"
+        "php": ">=5.5.0",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "symfony/var-dumper": "*"
