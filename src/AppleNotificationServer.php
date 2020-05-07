@@ -24,8 +24,13 @@ class AppleNotificationServer
     const CURL_HTTP_VERSION_2_0_KEY = 'CURL_HTTP_VERSION_2_0';
     const CURL_HTTP_VERSION_2_0_VALUE = 3;
     const APN_TOPIC_HEADER = 'apns-topic';
+
     const APN_EXPIRATION_HEADER = 'apns-expiration';
     const APN_PUSH_TYPE_HEADER = 'apns-push-type';
+    const APN_PRIORITY_HEADER = 'apns-priority';
+
+    const PRIORITY_HIGH = 10;   // default
+    const PRIORITY_NORMAL = 5;
 
     const PUSH_TYPE_ALERT = 'alert';
     const PUSH_TYPE_BACKGROUND = 'background';
@@ -69,6 +74,11 @@ class AppleNotificationServer
      * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
      */
     protected $pushType;
+    /**
+     * @var int 'apns-priority' header value. If not set APNS treats it's value as 10 (HIGH).
+     * @see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/sending_notification_requests_to_apns
+     */
+    protected $priority;
 
 
     /**
@@ -245,11 +255,13 @@ class AppleNotificationServer
         $this->setHeader($curlOptions, self::APN_TOPIC_HEADER, $this->topic);
         $this->setHeader($curlOptions, self::APN_EXPIRATION_HEADER, $this->expiration);
         $this->setHeader($curlOptions, self::APN_PUSH_TYPE_HEADER, $this->pushType);
+        $this->setHeader($curlOptions, self::APN_PRIORITY_HEADER, $this->priority);
     }
 
     /**
      * Sets curl header.
      *
+     * @param array $curlOptions
      * @param string $headerKey
      * @param string $headerValue
      */
@@ -299,6 +311,10 @@ class AppleNotificationServer
     {
         if (is_string($pushType)) {
             $this->pushType = $pushType;
+
+            if ($pushType === self::PUSH_TYPE_BACKGROUND) {
+                $this->priority = self::PRIORITY_NORMAL;
+            }
         }
     }
 }
